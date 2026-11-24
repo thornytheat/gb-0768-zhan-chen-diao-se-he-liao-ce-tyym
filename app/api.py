@@ -3,6 +3,7 @@ from flask import Blueprint,current_app,jsonify,request
 from app.faults import LedgerError
 from app.job import MixingJob,VIEWS
 from app.ledger.closeout import close
+from app.ledger.outward import issue,reveal,verify
 from app.ledger.signoff import certify
 from app.receipts.packet import read_sample
 
@@ -41,3 +42,22 @@ def export(key):
     response=jsonify(certify(bookshelf().require(key)))
     response.headers['Content-Disposition']=f'attachment; filename="palette-{key}.json"'
     return response
+
+
+@api.get('/books/<key>/outward')
+def outward(key):
+    response=jsonify(issue(bookshelf().require(key)))
+    response.headers['Content-Disposition']=f'attachment; filename="outward-{key}.json"'
+    return response
+
+
+@api.post('/outward/verify')
+def outward_verify():
+    body=verify(request.get_json(silent=True))
+    return jsonify(valid=True,key=body['key'],order=body['order'],totals=body['totals'])
+
+
+@api.get('/books/<key>/outward/<material>')
+def outward_reveal(key,material):
+    record=bookshelf().require(key)
+    return jsonify(key=key,material=material,lot=reveal(record,material))

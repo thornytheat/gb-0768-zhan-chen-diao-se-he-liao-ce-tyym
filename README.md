@@ -26,6 +26,8 @@ python -m pytest -q
 
 试算入口为 `GET /api/trial/{dirty|clean}/{stage}`。阶段名见深度登记。自有原件可提交 `POST /api/books`，JSON 用 `sheets` 包含 `job`、`weights`、`tares`、`lots`、`claims` 的 UTF-8 文本，也可使用 `{"sample":"dirty"}`。`GET /api/books` 查历史，`GET /api/books/{key}` 查单册库存，`GET /api/export/{key}` 下载证据。
 
+外发联：`GET /api/books/{key}/outward` 签发展方联并下载。采购批号与称量原件不出联，批号替换为按留档键派生的外发料号——同一份收据内同一批料同号，不同工单的收据无法靠料号串联；重量与对账结果带键控签章，改动后即使重算明文摘要也验不过。`POST /api/outward/verify` 核验外发联，`GET /api/books/{key}/outward/{外发料号}` 供内审回查原批号。签发是留档的纯函数，旧留档无需补录字段，重试签发号码不变。部署时用 `PALETTE_OUTWARD_SECRET` 配置签发密钥。
+
 - [数据定义](docs/DATA-DICTIONARY.md)
 - [模块与陷阱](docs/DEPTH.md)
 - [复核一张回桶票](docs/RECEIPT-REVIEW.md)

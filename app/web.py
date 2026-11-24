@@ -3,6 +3,7 @@ from flask import Blueprint,render_template,request
 from app.api import bookshelf
 from app.faults import LedgerError,REASONS
 from app.job import MixingJob
+from app.ledger.outward import issue
 from app.ledger.signoff import certify
 from app.receipts.clock import studio_label
 from app.receipts.packet import read_sample
@@ -23,12 +24,14 @@ def desk(screen='overview'):
     sample=request.args.get('sample','dirty')
     key=request.args.get('key')
     receipt=None
+    outward_copy=None
     if key:
         record=bookshelf().require(key)
         data,meta=record['snapshot'],record['manifest']
         sample=meta['source'] if meta['source']!='upload' else sample
         if screen=='receipt':
             receipt=certify(record)
+            outward_copy=issue(record)
     else:
         job=MixingJob(read_sample(sample))
         data,meta=job.snapshot(),{'order':job.job.order,'edition':EDITION,'cutoff':job.job.cutoff.isoformat()}
@@ -45,5 +48,5 @@ def desk(screen='overview'):
     if screen=='balance':
         rejects=data[screen]['invalid_receipts']
     return render_template('base.html',screen=screen,links=LINKS,sample=sample,key=key,data=data,meta=meta,
-                           receipt=receipt,history=history,labels=REASONS,actions=ACTIONS,grams=grams,
+                           receipt=receipt,outward=outward_copy,history=history,labels=REASONS,actions=ACTIONS,grams=grams,
                            studio_label=studio_label,rejects=rejects)

@@ -14,6 +14,7 @@
 | M5 库存与损耗对账 | 按批号核对存量、损耗与回桶申报 | `GET /api/trial/dirty/balance` | `app/blend/balance.py` `app/blend/claims.py` | `tests/test_balance.py` |
 | M6 批次留档复跑 | 封存工单及重跑 | `POST /api/books` | `app/ledger/bookshelf.py` `app/ledger/closeout.py` | `tests/test_history.py` |
 | M7 收据证据签发 | 签发可独立复核的成分收据 | `GET /api/export/{key}` | `app/ledger/signoff.py` | `tests/test_receipt.py` |
+| M8 外发联签发核验 | 签发展方联、核验签章、内审回查批号 | `GET /api/books/{key}/outward` | `app/ledger/outward.py` | `tests/test_outward.py` |
 
 ## 陷阱登记
 
